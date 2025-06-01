@@ -84,4 +84,110 @@ class NameCollectorTest extends TestCase
         $this->assertArrayHasKey($methodName, $procedures);
         $this->assertSame($className2, $procedures[$methodName]);
     }
+
+    /**
+     * 测试空字符串方法名
+     */
+    public function testAddProcedure_emptyMethodName(): void
+    {
+        $collector = new NameCollector();
+        
+        $methodName = '';
+        $className = 'TestClass';
+        
+        $collector->addProcedure($methodName, $className);
+        
+        $procedures = $collector->getProcedures();
+        
+        $this->assertCount(1, $procedures);
+        $this->assertArrayHasKey('', $procedures);
+        $this->assertSame($className, $procedures['']);
+    }
+
+    /**
+     * 测试空字符串类名
+     */
+    public function testAddProcedure_emptyClassName(): void
+    {
+        $collector = new NameCollector();
+        
+        $methodName = 'testMethod';
+        $className = '';
+        
+        $collector->addProcedure($methodName, $className);
+        
+        $procedures = $collector->getProcedures();
+        
+        $this->assertCount(1, $procedures);
+        $this->assertArrayHasKey($methodName, $procedures);
+        $this->assertSame('', $procedures[$methodName]);
+    }
+
+    /**
+     * 测试特殊字符方法名
+     */
+    public function testAddProcedure_specialCharactersInMethodName(): void
+    {
+        $collector = new NameCollector();
+        
+        $specialMethods = [
+            'method.with.dots' => 'TestClass1',
+            'method-with-dashes' => 'TestClass2',
+            'method_with_underscores' => 'TestClass3',
+            'method123WithNumbers' => 'TestClass4',
+            'UPPERCASE_METHOD' => 'TestClass5',
+            'MethodWithCamelCase' => 'TestClass6',
+        ];
+        
+        foreach ($specialMethods as $methodName => $className) {
+            $collector->addProcedure($methodName, $className);
+        }
+        
+        $procedures = $collector->getProcedures();
+        
+        $this->assertCount(count($specialMethods), $procedures);
+        
+        foreach ($specialMethods as $methodName => $className) {
+            $this->assertArrayHasKey($methodName, $procedures);
+            $this->assertSame($className, $procedures[$methodName]);
+        }
+    }
+
+    /**
+     * 测试特殊字符类名
+     */
+    public function testAddProcedure_specialCharactersInClassName(): void
+    {
+        $collector = new NameCollector();
+        
+        $methodName = 'testMethod';
+        $specialClassName = 'App\\Namespace\\ClassName';
+        
+        $collector->addProcedure($methodName, $specialClassName);
+        
+        $procedures = $collector->getProcedures();
+        
+        $this->assertCount(1, $procedures);
+        $this->assertArrayHasKey($methodName, $procedures);
+        $this->assertSame($specialClassName, $procedures[$methodName]);
+    }
+
+    /**
+     * 测试Unicode字符处理
+     */
+    public function testAddProcedure_unicodeCharacters(): void
+    {
+        $collector = new NameCollector();
+        
+        $methodName = '测试方法';
+        $className = 'TestClass中文';
+        
+        $collector->addProcedure($methodName, $className);
+        
+        $procedures = $collector->getProcedures();
+        
+        $this->assertCount(1, $procedures);
+        $this->assertArrayHasKey($methodName, $procedures);
+        $this->assertSame($className, $procedures[$methodName]);
+    }
 }
