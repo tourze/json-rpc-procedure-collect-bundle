@@ -27,8 +27,6 @@ class GetProcedureListTest extends TestCase
 
         // 执行方法并验证结果
         $result = $procedureList->execute();
-
-        $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
 
@@ -54,8 +52,6 @@ class GetProcedureListTest extends TestCase
 
         // 执行方法并验证结果
         $result = $procedureList->execute();
-
-        $this->assertIsArray($result);
         $this->assertCount(1, $result);
         $this->assertArrayHasKey('testMethod', $result);
         $this->assertSame('TestClass', $result['testMethod']);
@@ -85,8 +81,6 @@ class GetProcedureListTest extends TestCase
 
         // 执行方法并验证结果
         $result = $procedureList->execute();
-
-        $this->assertIsArray($result);
         $this->assertCount(count($procedureData), $result);
 
         foreach ($procedureData as $methodName => $className) {

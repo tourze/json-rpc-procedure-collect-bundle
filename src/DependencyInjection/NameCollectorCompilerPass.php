@@ -21,9 +21,9 @@ class NameCollectorCompilerPass implements CompilerPassInterface
         // 方法定义
         foreach ($container->findTaggedServiceIds(MethodExpose::JSONRPC_METHOD_TAG) as $serviceId => $tagAttributeList) {
             $procedureDef = $container->getDefinition($serviceId);
-            static::validateJsonRpcMethodDefinition($serviceId, $procedureDef);
+            self::validateJsonRpcMethodDefinition($serviceId, $procedureDef);
             foreach ($tagAttributeList as $tagAttributeKey => $tagAttributeData) {
-                static::validateJsonRpcMethodTagAttributes($serviceId, $tagAttributeData);
+                self::validateJsonRpcMethodTagAttributes($serviceId, $tagAttributeData);
                 $methodName = $tagAttributeData[self::JSONRPC_METHOD_TAG_METHOD_NAME_KEY];
                 $nameCollector->addMethodCall('addProcedure', [$methodName, $procedureDef->getClass()]);
             }
