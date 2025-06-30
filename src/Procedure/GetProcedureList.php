@@ -6,7 +6,7 @@ use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 use Tourze\JsonRPCProcedureCollectBundle\Service\NameCollector;
 
-#[MethodExpose('GetProcedureList')]
+#[MethodExpose(method: 'GetProcedureList')]
 class GetProcedureList extends BaseProcedure
 {
     public function __construct(private readonly NameCollector $collector)

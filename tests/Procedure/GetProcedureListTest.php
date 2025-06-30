@@ -114,8 +114,13 @@ class GetProcedureListTest extends TestCase
         $this->assertSame(MethodExpose::class, $attribute->getName());
 
         $arguments = $attribute->getArguments();
-        $this->assertCount(1, $arguments);
-        $this->assertSame('GetProcedureList', $arguments[0]);
+        // 检查是否为命名参数
+        if (isset($arguments['method'])) {
+            $this->assertSame('GetProcedureList', $arguments['method']);
+        } else {
+            $this->assertCount(1, $arguments);
+            $this->assertSame('GetProcedureList', $arguments[0]);
+        }
     }
 
     /**

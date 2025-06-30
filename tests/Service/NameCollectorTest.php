@@ -3,7 +3,38 @@
 namespace Tourze\JsonRPCProcedureCollectBundle\Tests\Service;
 
 use PHPUnit\Framework\TestCase;
+use Tourze\JsonRPC\Core\Attribute\MethodExpose;
+use Tourze\JsonRPC\Core\Domain\JsonRpcMethodInterface;
 use Tourze\JsonRPCProcedureCollectBundle\Service\NameCollector;
+
+#[MethodExpose(method: 'TestMethod1')]
+class TestJsonRpcMethod1 implements JsonRpcMethodInterface
+{
+    public function __invoke($request): mixed
+    {
+        return [];
+    }
+
+    public function execute(): array
+    {
+        return [];
+    }
+}
+
+#[MethodExpose(method: 'TestMethod2')]
+#[MethodExpose(method: 'TestMethod3')]
+class TestJsonRpcMethod2 implements JsonRpcMethodInterface
+{
+    public function __invoke($request): mixed
+    {
+        return [];
+    }
+
+    public function execute(): array
+    {
+        return [];
+    }
+}
 
 class NameCollectorTest extends TestCase
 {
@@ -12,7 +43,7 @@ class NameCollectorTest extends TestCase
      */
     public function testGetProcedures_initiallyEmpty(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
         $this->assertSame([], $collector->getProcedures());
     }
 
@@ -21,7 +52,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_singleMethod(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
 
         $methodName = 'testMethod';
         $className = 'TestClass';
@@ -40,7 +71,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_multipleMethods(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
 
         $methods = [
             'method1' => 'Class1',
@@ -67,7 +98,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_overwritesExistingMethod(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
 
         $methodName = 'duplicateMethod';
         $className1 = 'OriginalClass';
@@ -90,7 +121,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_emptyMethodName(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
         
         $methodName = '';
         $className = 'TestClass';
@@ -109,7 +140,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_emptyClassName(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
         
         $methodName = 'testMethod';
         $className = '';
@@ -128,7 +159,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_specialCharactersInMethodName(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
         
         $specialMethods = [
             'method.with.dots' => 'TestClass1',
@@ -158,7 +189,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_specialCharactersInClassName(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
         
         $methodName = 'testMethod';
         $specialClassName = 'App\\Namespace\\ClassName';
@@ -177,7 +208,7 @@ class NameCollectorTest extends TestCase
      */
     public function testAddProcedure_unicodeCharacters(): void
     {
-        $collector = new NameCollector();
+        $collector = new NameCollector([]);
         
         $methodName = '测试方法';
         $className = 'TestClass中文';
@@ -189,5 +220,32 @@ class NameCollectorTest extends TestCase
         $this->assertCount(1, $procedures);
         $this->assertArrayHasKey($methodName, $procedures);
         $this->assertSame($className, $procedures[$methodName]);
+    }
+
+    /**
+     * 测试通过构造函数初始化方法
+     */
+    public function testConstructor_withTaggedMethods(): void
+    {
+        $method1 = new TestJsonRpcMethod1();
+        $method2 = new TestJsonRpcMethod2();
+        
+        $taggedMethods = [$method1, $method2];
+        
+        $collector = new NameCollector($taggedMethods);
+        
+        $procedures = $collector->getProcedures();
+        
+        // TestJsonRpcMethod1 有1个方法，TestJsonRpcMethod2 有2个方法
+        $this->assertCount(3, $procedures);
+        
+        $this->assertArrayHasKey('TestMethod1', $procedures);
+        $this->assertSame(TestJsonRpcMethod1::class, $procedures['TestMethod1']);
+        
+        $this->assertArrayHasKey('TestMethod2', $procedures);
+        $this->assertSame(TestJsonRpcMethod2::class, $procedures['TestMethod2']);
+        
+        $this->assertArrayHasKey('TestMethod3', $procedures);
+        $this->assertSame(TestJsonRpcMethod2::class, $procedures['TestMethod3']);
     }
 }

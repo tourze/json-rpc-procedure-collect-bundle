@@ -6,3 +6,7 @@ services:
 
   Tourze\JsonRPCProcedureCollectBundle\Service\:
     resource: '../../Service/'
+
+  Tourze\JsonRPCProcedureCollectBundle\Service\NameCollector:
+    arguments:
+      - !tagged_iterator { tag: 'json_rpc_http_server.jsonrpc_method' }
