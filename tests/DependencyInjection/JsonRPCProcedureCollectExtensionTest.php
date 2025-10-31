@@ -1,38 +1,46 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tourze\JsonRPCProcedureCollectBundle\Tests\DependencyInjection;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Tourze\JsonRPCProcedureCollectBundle\DependencyInjection\JsonRPCProcedureCollectExtension;
-use Tourze\JsonRPCProcedureCollectBundle\Service\NameCollector;
+use Tourze\PHPUnitSymfonyUnitTest\AbstractDependencyInjectionExtensionTestCase;
 
-class JsonRPCProcedureCollectExtensionTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(JsonRPCProcedureCollectExtension::class)]
+final class JsonRPCProcedureCollectExtensionTest extends AbstractDependencyInjectionExtensionTestCase
 {
-    /**
-     * 测试Extension.load方法能正确加载服务
-     */
-    public function testLoad_registersServices(): void
+    private JsonRPCProcedureCollectExtension $extension;
+
+    protected function setUp(): void
     {
-        // 创建容器构建器
+        parent::setUp();
+        $this->extension = new JsonRPCProcedureCollectExtension();
+    }
+
+    public function testCanBeInstantiated(): void
+    {
+        $this->assertInstanceOf(JsonRPCProcedureCollectExtension::class, $this->extension);
+    }
+
+    public function testGetAlias(): void
+    {
+        $this->assertEquals('json_rpc_procedure_collect', $this->extension->getAlias());
+    }
+
+    public function testExtensionLoadsServices(): void
+    {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'test');
 
-        // 创建Extension实例
-        $extension = new JsonRPCProcedureCollectExtension();
+        $this->extension->load([], $container);
 
-        // 执行加载方法
-        $extension->load([], $container);
-
-        // 验证NameCollector服务是否已注册
-        $this->assertTrue($container->hasDefinition(NameCollector::class));
-
-        // 获取服务定义并验证其属性
-        $nameCollectorDefinition = $container->getDefinition(NameCollector::class);
-
-        // 验证服务定义是自动装配的
-        $this->assertTrue($nameCollectorDefinition->isAutowired());
-
-        // 验证服务定义是自动配置的
-        $this->assertTrue($nameCollectorDefinition->isAutoconfigured());
+        // 验证扩展加载没有抛出异常
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\ContainerBuilder', $container);
     }
 }

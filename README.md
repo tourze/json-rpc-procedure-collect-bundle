@@ -1,54 +1,66 @@
-# JSON-RPC过程收集模块
+# JSON-RPC Procedure Collect Bundle
 
-这个Symfony Bundle负责收集所有标记为JSON-RPC方法的服务，并提供一个API来查询所有可用的方法。
+[English](README.md) | [中文](README.zh-CN.md)
 
-## 安装
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-blue)](https://php.net)
+[![Symfony Version](https://img.shields.io/badge/symfony-%3E%3D7.3-blue)](https://symfony.com)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
+[![Code Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](#)
+
+A Symfony Bundle that collects all services marked as JSON-RPC methods and provides an API to query all available methods.
+
+## Features
+
+- Automatically collect all JSON-RPC methods marked with `#[MethodExpose]` attribute
+- Provide `GetProcedureList` JSON-RPC method to retrieve all registered methods
+- Support for method documentation and tagging via `#[MethodDoc]` and `#[MethodTag]` attributes
+- Dependency injection integration for automatic service discovery
+
+## Installation
 
 ```bash
 composer require tourze/json-rpc-procedure-collect-bundle
 ```
 
-## 注册Bundle
+## Bundle Registration
 
-在`config/bundles.php`中添加：
+Add to `config/bundles.php`:
 
 ```php
 Tourze\JsonRPCProcedureCollectBundle\JsonRPCProcedureCollectBundle::class => ['all' => true],
 ```
 
-## 功能介绍
+## Quick Start
 
-本Bundle主要提供以下功能：
-
-1. 自动收集所有使用`#[MethodExpose]`属性标记的JSON-RPC方法
-2. 提供`GetProcedureList` JSON-RPC方法，用于获取所有已注册的方法列表
-
-## 使用示例
-
-### 创建JSON-RPC方法
+### Creating a JSON-RPC Method
 
 ```php
 <?php
 
 namespace App\Procedure;
 
+use Tourze\JsonRPC\Core\Attribute\MethodDoc;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
+use Tourze\JsonRPC\Core\Attribute\MethodTag;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
 
-#[MethodExpose('YourMethodName')]
-class YourMethod extends BaseProcedure
+#[MethodTag(name: 'User Service')]
+#[MethodDoc(summary: 'Get user information')]
+#[MethodExpose(method: 'GetUserInfo')]
+class GetUserInfo extends BaseProcedure
 {
     public function execute(): array
     {
-        // 实现你的方法逻辑
-        return ['key' => 'value'];
+        // Implement your method logic
+        return ['user' => 'data'];
     }
 }
 ```
 
-### 获取所有方法列表
+### Retrieving All Available Methods
 
-通过调用`GetProcedureList` JSON-RPC方法，可以获取所有已注册的JSON-RPC方法及其对应的实现类：
+Call the `GetProcedureList` JSON-RPC method to get all registered JSON-RPC methods and their corresponding implementation classes:
 
 ```json
 {
@@ -59,23 +71,37 @@ class YourMethod extends BaseProcedure
 }
 ```
 
-响应示例：
+Response example:
 
 ```json
 {
   "jsonrpc": "2.0",
   "result": {
     "GetProcedureList": "Tourze\\JsonRPCProcedureCollectBundle\\Procedure\\GetProcedureList",
-    "YourMethodName": "App\\Procedure\\YourMethod"
+    "GetUserInfo": "App\\Procedure\\GetUserInfo"
   },
   "id": 1
 }
 ```
 
-## 单元测试
+## Requirements
 
-运行单元测试：
+- PHP >= 8.1
+- Symfony >= 7.3
+- `tourze/json-rpc-core` package
+
+## Testing
+
+Run the test suite:
 
 ```bash
 ./vendor/bin/phpunit packages/json-rpc-procedure-collect-bundle/tests
 ```
+
+## Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.

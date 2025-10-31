@@ -1,21 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tourze\JsonRPCProcedureCollectBundle\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPCProcedureCollectBundle\JsonRPCProcedureCollectBundle;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractBundleTestCase;
 
-class JsonRPCProcedureCollectBundleTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(JsonRPCProcedureCollectBundle::class)]
+#[RunTestsInSeparateProcesses]
+final class JsonRPCProcedureCollectBundleTest extends AbstractBundleTestCase
 {
-    /**
-     * 测试Bundle能正确实例化
-     */
-    public function testInstantiation_createsBundle(): void
-    {
-        $bundle = new JsonRPCProcedureCollectBundle();
-        
-        $this->assertInstanceOf(JsonRPCProcedureCollectBundle::class, $bundle);
-        $this->assertInstanceOf(Bundle::class, $bundle);
-    }
-} 
+}
