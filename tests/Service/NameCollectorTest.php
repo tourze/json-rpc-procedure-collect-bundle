@@ -4,8 +4,11 @@ namespace Tourze\JsonRPCProcedureCollectBundle\Tests\Service;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\JsonRPC\Core\Contracts\RpcParamInterface;
+use Tourze\JsonRPC\Core\Contracts\RpcResultInterface;
 use Tourze\JsonRPC\Core\Domain\JsonRpcMethodInterface;
 use Tourze\JsonRPC\Core\Model\JsonRpcRequest;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
 use Tourze\JsonRPCProcedureCollectBundle\Service\NameCollector;
 use Tourze\JsonRPCProcedureCollectBundle\Service\NameCollectorInterface;
 use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
@@ -227,26 +230,26 @@ final class NameCollectorTest extends AbstractIntegrationTestCase
     {
         // 创建匿名类实现 JsonRpcMethodInterface
         $mockMethod1 = new class implements JsonRpcMethodInterface {
-            public function __invoke(JsonRpcRequest $request): mixed
+            public function __invoke(JsonRpcRequest $request): RpcResultInterface
             {
-                return [];
+                return new ArrayResult([]);
             }
 
-            public function execute(): array
+            public function execute(RpcParamInterface $param): RpcResultInterface
             {
-                return [];
+                return new ArrayResult([]);
             }
         };
 
         $mockMethod2 = new class implements JsonRpcMethodInterface {
-            public function __invoke(JsonRpcRequest $request): mixed
+            public function __invoke(JsonRpcRequest $request): RpcResultInterface
             {
-                return [];
+                return new ArrayResult([]);
             }
 
-            public function execute(): array
+            public function execute(RpcParamInterface $param): RpcResultInterface
             {
-                return [];
+                return new ArrayResult([]);
             }
         };
 

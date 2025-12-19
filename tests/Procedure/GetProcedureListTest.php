@@ -6,11 +6,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\JsonRPC\Core\Attribute\MethodExpose;
 use Tourze\JsonRPC\Core\Procedure\BaseProcedure;
-use Tourze\JsonRPC\Core\Tests\AbstractProcedureTestCase;
+use Tourze\JsonRPC\Core\Result\ArrayResult;
+use Tourze\JsonRPCProcedureCollectBundle\Param\GetProcedureListParam;
 use Tourze\JsonRPCProcedureCollectBundle\Procedure\GetProcedureList;
 use Tourze\JsonRPCProcedureCollectBundle\Service\NameCollector;
 use Tourze\JsonRPCProcedureCollectBundle\Tests\Fixtures\AnotherTestProcedure;
 use Tourze\JsonRPCProcedureCollectBundle\Tests\Fixtures\TestProcedure;
+use Tourze\PHPUnitJsonRPC\AbstractProcedureTestCase;
 
 /**
  * @internal
@@ -38,12 +40,13 @@ final class GetProcedureListTest extends AbstractProcedureTestCase
         $procedureList = self::getService(GetProcedureList::class);
 
         // 执行方法并验证结果
-        $result = $procedureList->execute();
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('TestMethod1', $result);
-        $this->assertSame('TestClass1', $result['TestMethod1']);
-        $this->assertArrayHasKey('TestMethod2', $result);
-        $this->assertSame('TestClass2', $result['TestMethod2']);
+        $result = $procedureList->execute(new GetProcedureListParam());
+        $this->assertInstanceOf(ArrayResult::class, $result);
+        $data = $result->toArray();
+        $this->assertArrayHasKey('TestMethod1', $data);
+        $this->assertSame('TestClass1', $data['TestMethod1']);
+        $this->assertArrayHasKey('TestMethod2', $data);
+        $this->assertSame('TestClass2', $data['TestMethod2']);
     }
 
     /**
@@ -55,15 +58,16 @@ final class GetProcedureListTest extends AbstractProcedureTestCase
         $procedureList = self::getService(GetProcedureList::class);
 
         // 执行方法
-        $result = $procedureList->execute();
+        $result = $procedureList->execute(new GetProcedureListParam());
 
-        // 验证返回数组（可能包含默认注册的过程）
-        $this->assertIsArray($result);
+        // 验证返回ArrayResult
+        $this->assertInstanceOf(ArrayResult::class, $result);
+        $data = $result->toArray();
 
         // 如果有默认的GetProcedureList过程，验证它存在
-        if ([] !== $result) {
+        if ([] !== $data) {
             // 至少应该包含GetProcedureList自身
-            $this->assertArrayHasKey('GetProcedureList', $result);
+            $this->assertArrayHasKey('GetProcedureList', $data);
         }
     }
 
@@ -146,12 +150,13 @@ final class GetProcedureListTest extends AbstractProcedureTestCase
         $procedureList = self::getService(GetProcedureList::class);
 
         // 执行方法并验证结果
-        $result = $procedureList->execute();
+        $result = $procedureList->execute(new GetProcedureListParam());
+        $data = $result->toArray();
 
         // 验证所有添加的过程都存在
         foreach ($testProcedures as $method => $class) {
-            $this->assertArrayHasKey($method, $result);
-            $this->assertSame($class, $result[$method]);
+            $this->assertArrayHasKey($method, $data);
+            $this->assertSame($class, $data[$method]);
         }
     }
 
@@ -169,17 +174,18 @@ final class GetProcedureListTest extends AbstractProcedureTestCase
         $procedureList = self::getService(GetProcedureList::class);
 
         // 执行方法
-        $result = $procedureList->execute();
+        $result = $procedureList->execute(new GetProcedureListParam());
+        $data = $result->toArray();
 
         // 验证测试过程被正确收集
-        $this->assertIsArray($result);
+        $this->assertIsArray($data);
 
         // 至少应该包含GetProcedureList自身
-        $this->assertArrayHasKey('GetProcedureList', $result);
+        $this->assertArrayHasKey('GetProcedureList', $data);
 
         // 验证手动添加的过程存在
-        $this->assertSame(TestProcedure::class, $result['TestMethod']);
-        $this->assertSame(AnotherTestProcedure::class, $result['AnotherTestMethod']);
+        $this->assertSame(TestProcedure::class, $data['TestMethod']);
+        $this->assertSame(AnotherTestProcedure::class, $data['AnotherTestMethod']);
     }
 
     /**
@@ -191,13 +197,14 @@ final class GetProcedureListTest extends AbstractProcedureTestCase
         $procedureList = self::getService(GetProcedureList::class);
 
         // 执行方法
-        $result = $procedureList->execute();
+        $result = $procedureList->execute(new GetProcedureListParam());
 
-        // 验证返回类型是数组
-        $this->assertIsArray($result);
+        // 验证返回类型是ArrayResult
+        $this->assertInstanceOf(ArrayResult::class, $result);
+        $data = $result->toArray();
 
         // 验证数组的键值对格式（方法名 => 类名）
-        foreach ($result as $methodName => $className) {
+        foreach ($data as $methodName => $className) {
             $this->assertIsString($methodName);
             $this->assertIsString($className);
         }
